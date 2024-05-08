@@ -407,6 +407,34 @@ class environment_base:
 
         return power_allocation
 
+    def allocate_RUs_only_1_each(self, single_ru_mapper):
+        num_people, num_RUs = single_ru_mapper.shape
+        # 标记数组，记录每个球是否已分配
+        allocated = np.zeros(num_RUs, dtype=bool)
+        # 记录每个人已分配球的数量
+        RUs_per_user = np.zeros(num_people, dtype=int)
+        # 记录每个人的球分配情况
+        allocation = [[] for _ in range(num_people)]
+        # 对每个人的奖励按降序排列球的索引
+        sorted_indices = np.argsort(-single_ru_mapper, axis=1)
+        
+        # 首先分配每个人至少一个球，确保每个人都有球
+        for user in range(num_people):
+            for RU_index in sorted_indices[user]:
+                if not allocated[RU_index]:
+                    allocation[user].append(RU_index)
+                    allocated[RU_index] = True
+                    RUs_per_user[user] += 1
+                    break  # 继续下一个人的分配
+
+        # 结果矩阵，记录分配情况
+        result_matrix = np.zeros((num_people, num_RUs), dtype=int)
+        for user, RUs in enumerate(allocation):
+            for RU in RUs:
+                result_matrix[user, RU] = 1
+
+        return result_matrix
+    
     def allocate_RUs(self, single_ru_mapper):
         num_people, num_RUs = single_ru_mapper.shape
         # 标记数组，记录每个球是否已分配
