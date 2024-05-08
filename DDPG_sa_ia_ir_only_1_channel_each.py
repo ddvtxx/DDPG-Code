@@ -53,9 +53,6 @@ for i_seed in range(50):
                 action_pre = DDPG_agent.choose_action(observation[3],train=False)
                 action_pre = action_pre.reshape(numAPuser,numRU)
                 action_0 = test_env.allocate_RUs_only_1_each(action_pre)
-
-                print(test_env.count_user_without_RU(action_0))
-
                 action_1=action_0.reshape(1,numAPuser,numRU)
                 AP123_RU_mapper = test_env.n_AP_RU_mapper()
                 RU_mapper = np.vstack((AP123_RU_mapper,action_1))
